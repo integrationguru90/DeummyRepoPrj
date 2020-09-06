@@ -1,2 +1,2 @@
 # DeummyRepoPrj
-DeummyRepoPrj is a dummy GitHub Repository.
+DeummyRepoPrj is a dummy GitHub Repository for demo.
