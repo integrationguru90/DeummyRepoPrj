@@ -1,1 +1,183 @@
-Created By James.
+/* ****SQL*****  https://www.tutorialspoint.com/plsql/plsql_arrays.htm */
+
+-- Create Table:
+CREATE TABLE study_status(  
+record_id varchar(255) default sys_guid() NOT NULL PRIMARY KEY ,  
+study_id varchar(255) NOT NULL,  
+status varchar(255),
+comment varchar(255)
+);
+
+-- DELETE , TRUNCATE TABLE, DROP TABLE
+DELETE from TestTable where Record_id = 1000; or DELETE from TestTable; -- DELETE : will delete rows from the table, can also use where clause.
+TRUNCATE TABLE TestTable; --TRUNCATE : It's like DELETE without any where clause. will delete all rows and is faster than DELETE, and uses less resources.
+DROP TABLE TestTable; -- DROP : (Delete the defination and all data of a table.)
+
+-- Copy a table:
+create table TestTable_Copy 
+as 
+select * from TestTable 
+where 1=1; -- This will create the table and will also copy the data from the source table.
+
+-- Insert into a table of data from another table (Given column datatype matches)
+insert into Employee_copy_30Dec2020 (select * from EMPLOYEE where LASTNAME='Parashar')
+
+-- GROUP BY : With this we can use aggregate func (Count (), avg (), sum (), min (), Max()) and group output of select statment
+select LASTNAME count (*) from employee group by LASTNAME; -- will fetch distinct lastname in the table and their count within the table.
+select LASTNAME, Firstname count (*) from employee group by LASTNAME,Firstname order by LASTNAME, Firstname;
+-- whatever you are grouping by should be in select query too.
+-- If you specify the GROUP BY clause, columns referenced must be all the columns in the SELECT clause that do not contain an aggregate function.
+
+
+-- JOINs (INNER/ Simple Join, LEFT outer JOIN, Right outer join, full outer join, cross join) 
+-- (SQL INNER JOIN also known as simple join is the most common type of join.)
+-- Inner / Simple join: example
+
+-- mostly used syntax for simple/inner join
+select ss.STUDY_ID, ss.STATUS, sd.Sponsor
+from study_details sd, study_status ss
+where ss.STUDY_ID=sd.STUDY_ID;
+
+-- it's same as the above query just with proper inner join syntax
+select ss.STUDY_ID, ss.STATUS, sd.Sponsor
+from study_details sd
+INNER JOIN study_status ss
+ON
+ss.STUDY_ID=sd.STUDY_ID
+
+-- It will fetch all records of study_details (in left of the join) and will put null in other columns if condition doesn't match
+select ss.STUDY_ID, ss.STATUS, sd.Sponsor
+from study_details sd
+LEFT OUTER JOIN study_status ss
+ON
+ss.STUDY_ID=sd.STUDY_ID
+
+-- It will fetch all records of study_status (in Right of the join) and will put null in other columns if condition doesn't match
+select ss.STUDY_ID, ss.STATUS, sd.Sponsor
+from study_details sd
+RIGHT OUTER JOIN study_status ss
+ON
+ss.STUDY_ID=sd.STUDY_ID
+
+-- It will fetch all records of both tables and will put null in other columns if condition doesn't match
+select ss.STUDY_ID, ss.STATUS, sd.Sponsor
+from study_details sd
+INNER JOIN study_status ss
+ON
+ss.STUDY_ID=sd.STUDY_ID
+
+-- *********************************************************************************************************************************** --
+-- PL/SQL:
+-- example of using into with select statment to put values into variables.
+DECLARE
+c_id CUSTOMERS.ID%TYPE := 1;
+c_name CUSTOMERS.NAME%TYPE;
+c_salary CUSTOMERS.SALARY%TYPE;
+BEGIN
+select NAME, SALARY into c_name, c_salary 
+from CUSTOMERS 
+where ID=c_id;
+dbms_output.put_line 
+   ('Customer ID : ' ||c_id || ', Name : ' || c_name || ' earns ' || c_salary); 
+END;
+
+
+-- For loop and lableing of loops (Not mandate but can come in handy)
+
+DECLARE 
+   i number(1); 
+   j number(1); 
+BEGIN 
+  << First_Loop >>
+   FOR i IN 1..2 LOOP 
+      << Second_Loop >>
+      FOR j IN 1..2 LOOP 
+         dbms_output.put_line('i is: '|| i || ' and j is: ' || j); 
+      END loop Second_Loop; 
+   END loop First_Loop; 
+END; 
+
+-- some useful string functions:
+DECLARE 
+   greetings varchar2(11) := 'hello world'; 
+BEGIN 
+   dbms_output.put_line(UPPER(greetings)); 
+    
+   dbms_output.put_line(LOWER(greetings)); 
+    
+   dbms_output.put_line(INITCAP(greetings)); 
+    
+   /* retrieve the first character in the string */ 
+   dbms_output.put_line ( SUBSTR (greetings, 1, 1)); 
+    
+   /* retrieve the last character in the string */ 
+   dbms_output.put_line ( SUBSTR (greetings, -1, 1)); 
+    
+   /* retrieve five characters,  
+      starting from the seventh position. */ 
+   dbms_output.put_line ( SUBSTR (greetings, 7, 5)); 
+    
+   /* retrieve the remainder of the string, 
+      starting from the second position. */ 
+   dbms_output.put_line ( SUBSTR (greetings, 2)); 
+     
+   /* find the location of the first "e" */ 
+   dbms_output.put_line ( INSTR (greetings, 'e')); 
+END; 
+
+
+-- some Duplicate string functions:
+DECLARE 
+   greetings varchar2(11) := 'hello world'; 
+BEGIN 
+   dbms_output.put_line(UPPER(greetings)); 
+    
+   dbms_output.put_line(LOWER(greetings)); 
+    
+   dbms_output.put_line(INITCAP(greetings)); 
+    
+   /* retrieve the first character in the string */ 
+   dbms_output.put_line ( SUBSTR (greetings, 1, 1)); 
+    
+   /* retrieve the last character in the string */ 
+   dbms_output.put_line ( SUBSTR (greetings, -1, 1)); 
+    
+   /* retrieve five characters,  
+      starting from the seventh position. */ 
+   dbms_output.put_line ( SUBSTR (greetings, 7, 5)); 
+    
+   /* retrieve the remainder of the string, 
+      starting from the second position. */ 
+   dbms_output.put_line ( SUBSTR (greetings, 2)); 
+     
+   /* find the location of the first "e" */ 
+   dbms_output.put_line ( INSTR (greetings, 'e')); 
+END; 
+
+
+-- Example of array and loop: (In Oracle environment, the starting index for varrays is always 1.)
+
+DECLARE 
+   type namesarray IS VARRAY(5) OF VARCHAR2(10); 
+   type grades IS VARRAY(5) OF INTEGER; 
+   names namesarray; 
+   marks grades; 
+   total integer; 
+BEGIN 
+   names := namesarray('Sanjay', 'Pritam', 'Ayan', 'Rishav', 'Aziz'); 
+   marks:= grades(98, 97, 78, 87, 92); 
+   total := names.count; 
+   dbms_output.put_line('Total '|| total || ' Students'); 
+   FOR i in 1 .. total LOOP 
+      dbms_output.put_line('Student: ' || names(i) || ' 
+      Marks: ' || marks(i)); 
+   END LOOP; 
+END; 
+/
+
+-- Cursor : is a pointer to a memeory area called context area. context area has memory assigned to hold information about processing Select or DML statment.
+-- Implicite cursors are oracle server defined cursor and user can't change those.
+-- Explicite cursors are user define cursors (Declare -- Open -- Fetch -- Close)
+
+https://blogs.oracle.com/oraclemagazine/working-with-cursors
+https://bigdataenthusiast.wordpress.com/2020/06/02/cursors-in-pl-sql/
